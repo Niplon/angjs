@@ -74,6 +74,6 @@
 	/* angular>module>service>localstorage.service>LocalStorage adding service structure by placement */
 	angular.module('storage', []) 
 		.service('localstorage.service', LocalStorage)
-		.service('sessionStorage.service', LocalStorage);
+		.service('sessionStorage.service', SessionStorage);
 
 })();
