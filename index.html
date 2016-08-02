@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="mainApp" ng-strict-di="true" ng-cloak>
+<head>
+	<meta charset="UTF-8">
+	<title>AngularJS Course</title>
+	<style type="text/css">
+		@charset "UTF-8";
+		[ng\:cloak],
+		[ng-cloak],
+		[data-ng-cloak],
+		[x-ng-cloak],
+		.ng-cloak,
+		.x-ng-cloak,
+		.ng-hide:not(.ng-hide-animate) {
+		    display: none !important;
+		}
+
+		ng\:form {
+		    display: block;
+		}
+
+		.ng-animate-shim {
+		    visibility: hidden;
+		}
+
+		.ng-anchor {
+		    position: absolute;
+		}
+	</style>
+
+</head>
+<body>
+	<div ng-controller="mainApp.FatherCtrl as FatherCtrl">
+		<div class="wrapper" ng-controller="mainApp.mainAppCtrl as mainAppCtrl">
+			<input type="text" name="name" ng-model="mainAppCtrl.fatherUserName">
+			{{ hi }}
+
+			{{ FatherCtrl.hi }}
+			{{ mainAppCtrl.username }} {{ FatherCtrl.username }}
+		</div>
+	</div>
+
+	<script src="scripts/angular.js"></script>
+	<script src="scripts/angular-route.js"></script>
+	<script src="scripts/angular-sanitize.js"></script>
+	<script src="scripts/angular-touch.js"></script>
+	<script src="assets/infrastruct/service/localstorage.service.js"></script>
+	<script src="assets/infrastruct/service/math.service.js"></script>
+	<script>
+	(function(){
+		var app = angular.module('mainApp', ['ngRoute', 'ngSanitize', 'ngTouch', 'storage', 'math']);
+
+		app.run(function(){
+			console.log("run");
+		});
+
+		/* Not recommended to write
+		app.controller('mainApp.mainAppCtrl', ['$scope', function($scope){
+			console.log("mainAppCtrl");
+
+			var hi = 1+1;
+
+			$scope.hi = hi;
+		}]);*/
+
+
+		/* recommended to prepeare for angular 2 */
+		FatherCtrl.$inject = ['$scope', 'localstorage.service'];  /*dependency injection */
+		/* Use this instead of $scope */
+		function FatherCtrl($scope){ /* Class setting */
+			var ctrl = this;
+			console.log("FatherCtrl");
+
+			var hi = 1+1;
+
+			this.hi = hi;
+
+			this.username = "arnold";
+			this.age = 30;
+
+			$scope.$on('input:change', function(e, fathername){
+				ctrl.username = fathername;
+			});
+		};
+
+		app.controller('mainApp.FatherCtrl', FatherCtrl);
+
+		MainAppCtrl.$inject = ['$scope']; /* dependency injection */
+		function MainAppCtrl($scope){ /* Class setting */
+			console.log("mainAppCtrl");
+
+			var hi = 1+1,
+			ctrl = this;
+
+			this.hi = hi;
+			this.username = "shlomo";
+			this.fatherUserName = "";
+
+			$scope.$watch(function(){
+				return ctrl.fatherUserName;
+			},function(newValue, oldValue){
+				if(newValue === oldValue){
+					return;
+				}
+				/* $emit send notification up the tree, broadcast sends down the tree */
+				$scope.$emit('input:change', newValue);
+			});
+			
+		}
+
+		app.controller('mainApp.mainAppCtrl', MainAppCtrl);
+
+		/*
+		found class name MainAppCtrl
+		search for $inject
+
+		new MainAppCtrl($scope, b)
+		*/
+
+	})();
+	</script>
+</body>
+</html>
